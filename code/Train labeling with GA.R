@@ -14,28 +14,6 @@ for(symbol in symbols){
   
   names(stock) <- c("Date", "Open")
   
-  GA_sharp <- ga(type="binary",
-                 fitness = obj_sharp,
-                 nBits = nrow(stock),
-                 popSize = 300,
-                 maxiter = 1000,
-                 elitism = 10,
-                 seed = 20207188,
-                 parallel = T)
-  
-  saveRDS(GA_sharp, paste0("../data/GA_RDS/", symbol, "_sharp.rds"))
-  
-  GA_point <- ga(type="binary",
-                 fitness = obj_point,
-                 nBits = nrow(stock),
-                 popSize = 300,
-                 maxiter = 1000,
-                 elitism = 10,
-                 seed = 20207188,
-                 parallel = T)
-  
-  saveRDS(GA_point, paste0("../data/GA_RDS/", symbol, "_point.rds"))
-  
   GA_paper <- ga(type="binary",
                  fitness = obj_paper,
                  nBits = nrow(stock),
