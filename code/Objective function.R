@@ -1,65 +1,7 @@
 library(GA)
 library(dplyr)
 
-#1. sharp trans
-obj_sharp <- function(stock_labels){
-  data <- cbind(stock, label=as.vector(stock_labels)+1)
-  
-  data$label[nrow(data)]=2
-  
-  data2 <- data %>% 
-    dplyr::select(Date, label) %>%
-    dplyr::mutate(label = ifelse(label-dplyr::lag(label)!=0 | is.na(label-dplyr::lag(label)), label, 0)) %>%
-    dplyr::filter(label != 0) %>% 
-    merge(data %>% dplyr::mutate(Open = lead(Open)) %>% dplyr::select(Date, Open), by="Date", all=T) %>% 
-    dplyr::filter(!is.na(label)) %>% 
-    dplyr::filter(!is.na(Open))
-  
-  if((length(data2$label)==1 & data2$label[1]==2) |
-     (length(data2$label)==2 & data2$label[1]==2)){return(min(data$Open)-max(data$Open))}
-  if(data2$label[1]==2){data2$label[1]=NA}
-  
-  data3 <- data2 %>%
-    dplyr::filter(!is.na(label)) %>%
-    dplyr::mutate(profit = Open-dplyr::lag(Open,1)) %>% 
-    dplyr::filter(label == 2)
-  
-  total_W <- sum(data3$profit[data3$profit>0])
-  total_L <- sum(data3$profit[data3$profit<0])
-  profit_sd <- sd(data3$profit)
-  
-  return((total_W+total_L)/profit_sd)
-}
-
-#2. point
-obj_point <- function(stock_labels){
-  data <- cbind(stock, label=as.vector(stock_labels)+1)
-  
-  data$label[nrow(data)]=2
-  
-  data2 <- data %>% 
-    dplyr::select(Date, label) %>%
-    dplyr::mutate(label = ifelse(label-dplyr::lag(label)!=0 | is.na(label-dplyr::lag(label)), label, 0)) %>%
-    dplyr::filter(label != 0) %>% 
-    merge(data %>% dplyr::mutate(Open = lead(Open)) %>% dplyr::select(Date, Open), by="Date", all=T) %>% 
-    dplyr::filter(!is.na(label)) %>% 
-    dplyr::filter(!is.na(Open))
-  
-  if((length(data2$label)==1 & data2$label[1]==2) |
-     (length(data2$label)==2 & data2$label[1]==2)){return(min(data$Open)-max(data$Open))}
-  if(data2$label[1]==2){data2$label[1]=NA}
-  
-  data3 <- data2 %>%
-    dplyr::filter(!is.na(label)) %>%
-    dplyr::mutate(profit = Open-dplyr::lag(Open,1)) %>% 
-    dplyr::filter(label == 2) 
-  
-  cum_profit <- sum(data3$profit)
-  
-  return(cum_profit)
-}
-
-#3. paper 
+#Kim & Enke (2017)
 obj_paper <- function(stock_labels){
   data <- cbind(stock, label=as.vector(stock_labels)+1)
   
