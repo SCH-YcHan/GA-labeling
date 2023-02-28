@@ -3,7 +3,7 @@ library(dplyr)
 
 #Kim & Enke (2017)
 obj_paper <- function(stock_labels){
-  data <- cbind(stock, label=as.vector(stock_labels)+1)
+  data <- cbind(stock, label=as.vector(stock_labels)+1) 
   
   data$label[nrow(data)]=2
   
@@ -16,7 +16,7 @@ obj_paper <- function(stock_labels){
     dplyr::filter(!is.na(Open))
   
   if((length(data2$label)==1 & data2$label[1]==2) |
-     (length(data2$label)==2 & data2$label[1]==2)){return(min(data$Open)-max(data$Open))}
+     (length(data2$label)==2 & data2$label[1]==2)){return(0)}
   if(data2$label[1]==2){data2$label[1]=NA}
   
   data3 <- data2 %>%
