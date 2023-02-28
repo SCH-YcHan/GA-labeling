@@ -26,8 +26,8 @@ for(symbol in symbols){
                    fitness = obj_paper,
                    nBits = nrow(stock),
                    popSize = 300,
-                   maxiter = 2000,
-                   elitism = 10,
+                   maxiter = 1000,
+                   elitism = 3,
                    seed = 20207188,
                    parallel = T)
     
