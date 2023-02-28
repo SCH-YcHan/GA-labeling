@@ -1,7 +1,5 @@
 rm(list=ls())
 
-setwd("C:/Users/user/ga-labeling/code")
-
 library(GA)
 library(dplyr)
 library(tidyr)
@@ -21,7 +19,7 @@ train <- left_join(ud, ti %>% select(Date, Open), by="Date")
 train$label <- na.locf(train$label)
 
 ensemble_fun <- function(ensem_v, symbol, type=F){
-
+  
   v_len <- length(ensem_v)
   
   if(type==F){
@@ -62,20 +60,50 @@ test$label <- na.locf(test$label)
 test$label2[test$label2==0] <- NA
 test$label2 <- na.locf(test$label2)
 
-p1 <- ggplot(test, aes(x=as.Date(Date), y=Open)) +
-  geom_line() +
-  labs(x=NULL, y="Open") +
-  theme_bw()
+p1_test <- test %>%
+  select(Date, label2) %>%
+  mutate(label2 = ifelse(label2-lag(label2)!=0 | is.na(label2-lag(label2)), label2, 0)) %>%
+  filter(label2 != 0) %>% 
+  merge(test %>% select(Date, Open), by="Date", all=T)
+
+p1_test$label2 <- ifelse(p1_test$label2==1, "Buy", ifelse(p1_test$label2==2, "Sell", NA))
+
+a <- p1_test %>% 
+  mutate(Label = factor(label2, levels=c("Buy", "Sell"))) %>% 
+  select(-label2)
+p1 <- a %>%
+  ggplot(aes(x=as.Date(Date), y=Open)) + 
+  geom_line() + 
+  theme_bw() +
+  labs(x = NULL, y = "Stock Price") +
+  (a %>% 
+     filter(!is.na(Label)) %>% 
+     geom_point(mapping = aes(x=as.Date(Date), y=Open, color=Label, shape=Label, fill=Label))) + 
+  scale_color_manual(values = c("green", "red")) +
+  scale_shape_manual(values = c(24,25)) +
+  scale_fill_manual(values = c("green", "red")) + 
+  theme(
+    legend.text = element_text(size=10),
+    legend.position = c(0.1,0.7),
+    legend.box.background = element_rect(colour = "black"),
+    axis.title.y = element_text(size=12, margin=margin(r=7))
+  )
 
 p2 <- ggplot(test, aes(x=as.Date(Date), y=label)) +
   geom_step() +
   labs(x=NULL, y="Updown") +
-  theme_bw()
+  theme_bw() +
+  theme(
+    axis.title.y = element_text(size=12, margin=margin(r=5))
+  )
 
 p3 <- ggplot(test, aes(x=as.Date(Date), y=label2)) +
   geom_step() +
   labs(x=NULL, y="SGA") +
-  theme_bw()
+  theme_bw() +
+  theme(
+    axis.title.y = element_text(size=12, margin=margin(r=5))
+  )
 
 trading <- test
 
@@ -133,8 +161,10 @@ p4 <- ggplot(df_long, aes(x = as.Date(Date), y = cumulative_profit, color = Labe
   scale_linetype_manual(values = c("solid", "dashed")) +
   theme_bw() +
   theme(
-    legend.position = "top",
-    legend.title = element_blank()
+    legend.text = element_text(size=10),
+    legend.position = c(0.1, 0.7),
+    legend.box.background = element_rect(colour = "black"),
+    axis.title.y = element_text(size=12, margin=margin(r=12.5))
   )
 
 grid.arrange(
