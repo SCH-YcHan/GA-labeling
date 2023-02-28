@@ -32,10 +32,10 @@ obj_paper <- function(stock_labels){
   Pr <- mean_W/mean_L
   Pf <- Pr*((Nw/(N_trade-Nw)))
   
-  if(N_trade>30 & Wr>=0.33 & Wr<=0.80 & Pr>=1 & Pf>=1){
+  if(N_trade>30 & Wr>=0.33 & Wr<=0.80 & Pr>=0.25 & Pr<=2 & Pf>=1){
     return((Wr*mean_W-(1-Wr)*mean_L)/mean_L*N_trade)
   }else{
-    return(min(data$Open)-max(data$Open))
+    return(0)
   }
 }
 
