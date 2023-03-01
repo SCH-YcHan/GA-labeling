@@ -24,22 +24,26 @@ MEAN_SD <- function(x){
 }
 
 paper_result %>% 
+  filter(Model!="svm") %>% 
   select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
   group_by(Model) %>% 
   summarise_all(.funs=MEAN_SD)
 
 paper_result %>% 
+  filter(Model!="svm") %>% 
   filter(!(Symbol %in% remove_symbol)) %>%
   select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
   group_by(Model) %>% 
   summarise_all(.funs=MEAN_SD)
 
 UD_result %>% 
+  filter(Model!="svm") %>% 
   select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
   group_by(Model) %>% 
   summarise_all(.funs=MEAN_SD)
 
 UD_result %>% 
+  filter(Model!="svm") %>% 
   filter(!(Symbol %in% remove_symbol)) %>%
   select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
   group_by(Model) %>% 
