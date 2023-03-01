@@ -1,11 +1,21 @@
 rm(list=ls())
 
 library(dplyr)
+library(stringr)
 library(ggplot2)
 library(gridExtra)
 
 paper_result <- read.csv("./data/paper_result_IS_commission_60.csv")
 UD_result <- read.csv("./data/UD_commission_result_60.csv")
+
+remove_symbol <- c()
+rds_path <- "./data/GA_RDS/"
+for(s in list.files(rds_path)){
+  ga_rds <- readRDS(paste0(rds_path,s))
+  if(ga_rds@fitnessValue==0){
+    remove_symbol <- c(remove_symbol, str_split(s, "_")[[1]][1])
+  }
+}
 
 MEAN_SD <- function(x){
   M <- round(mean(x, na.rm=T), 2)
@@ -18,7 +28,19 @@ paper_result %>%
   group_by(Model) %>% 
   summarise_all(.funs=MEAN_SD)
 
+paper_result %>% 
+  filter(!(Symbol %in% remove_symbol)) %>%
+  select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
+  group_by(Model) %>% 
+  summarise_all(.funs=MEAN_SD)
+
 UD_result %>% 
+  select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
+  group_by(Model) %>% 
+  summarise_all(.funs=MEAN_SD)
+
+UD_result %>% 
+  filter(!(Symbol %in% remove_symbol)) %>%
   select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
   group_by(Model) %>% 
   summarise_all(.funs=MEAN_SD)
