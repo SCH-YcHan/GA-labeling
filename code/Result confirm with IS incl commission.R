@@ -4,8 +4,8 @@ library(dplyr)
 library(ggplot2)
 library(gridExtra)
 
-paper_result <- read.csv("../data/paper_result_IS_commission_60.csv")
-UD_result <- read.csv("../data/UD_commission_result_60.csv")
+paper_result <- read.csv("./data/paper_result_IS_commission_60.csv")
+UD_result <- read.csv("./data/UD_commission_result_60.csv")
 
 MEAN_SD <- function(x){
   M <- round(mean(x, na.rm=T), 2)
