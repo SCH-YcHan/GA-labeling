@@ -47,7 +47,7 @@ model_ensemble <- function(ensem_v, symbol){
   v_len <- length(ensem_v)
   
   for (i in 1:v_len){
-    f <- read.csv(paste0("../data/Pred_result/", symbol, "_PAPER_", ensem_v[i], ".csv"))
+    f <- read.csv(paste0("./data/Pred_result/", symbol, "_PAPER_", ensem_v[i], ".csv"))
     assign(ensem_v[i], f)
   }
   
@@ -68,7 +68,7 @@ model_ensemble2 <- function(ensem_v, symbol){
   v_len <- length(ensem_v)
   
   for (i in 1:v_len){
-    f <- read.csv(paste0("../data/Pred_result/", symbol, "_PAPER_", ensem_v[i], ".csv"))
+    f <- read.csv(paste0("./data/Pred_result/", symbol, "_PAPER_", ensem_v[i], ".csv"))
     assign(ensem_v[i], f)
   }
   
@@ -87,7 +87,7 @@ model_ensemble2 <- function(ensem_v, symbol){
   return(cbind(Symbol = symbol, trade_result))
 }
 
-Symbols <- read.csv("../data/NASDAQ_Marketcap60.csv")$Symbol
+Symbols <- read.csv("./data/NASDAQ_Marketcap60.csv")$Symbol
 
 ensemble_lr_nn <- data.frame()
 for (symbol in Symbols){
@@ -96,7 +96,7 @@ for (symbol in Symbols){
   ensemble_lr_nn <- rbind(ensemble_lr_nn, row)
 }
 
-write.csv(ensemble_lr_nn, "../data/Ensemble_LR_NN.csv", row.names=F)
+write.csv(ensemble_lr_nn, "./data/Ensemble_LR_NN.csv", row.names=F)
 
 ensemble_lr_xgb <- data.frame()
 for (symbol in Symbols){
@@ -105,7 +105,7 @@ for (symbol in Symbols){
   ensemble_lr_xgb <- rbind(ensemble_lr_xgb, row)
 }
 
-write.csv(ensemble_lr_xgb, "../data/Ensemble_LR_XGB.csv", row.names=F)
+write.csv(ensemble_lr_xgb, "./data/Ensemble_LR_XGB.csv", row.names=F)
 
 ensemble_nn_xgb <- data.frame()
 for (symbol in Symbols){
@@ -114,7 +114,7 @@ for (symbol in Symbols){
   ensemble_nn_xgb <- rbind(ensemble_nn_xgb, row)
 }
 
-write.csv(ensemble_nn_xgb, "../data/Ensemble_NN_XGB.csv", row.names=F)
+write.csv(ensemble_nn_xgb, "./data/Ensemble_NN_XGB.csv", row.names=F)
 
 ensemble_lr_nn_xgb <- data.frame()
 for (symbol in Symbols){
@@ -123,6 +123,6 @@ for (symbol in Symbols){
   ensemble_lr_nn_xgb <- rbind(ensemble_lr_nn_xgb, row)
 }
 
-write.csv(ensemble_lr_nn_xgb, "../data/Ensemble_LR_NN_XGB.csv", row.names=F)
+write.csv(ensemble_lr_nn_xgb, "./data/Ensemble_LR_NN_XGB.csv", row.names=F)
 
 
