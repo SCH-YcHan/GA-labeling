@@ -117,6 +117,10 @@ pred_result <- function(TI_file, label_file, symbol, obj_name){
 
 Symbols <- read.csv("./data/NASDAQ_Marketcap60.csv")$Symbol
 
+if(!file.exists("./data/Pred_result")){
+  dir.create("./data/Pred_result")
+}
+
 for (symbol in Symbols){
   stock <- read.csv(paste0("./data/Stock_TI/",symbol ,"_TI.csv"))
   stock$Date <- as.Date(stock$Date)
