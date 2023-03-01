@@ -22,7 +22,7 @@ prediction <- function(train, test, symbol, obj_name){
                            label=round(xgb_test_pre,4),
                            train_size=nrow(train))
   
-  write.csv(xgb_test_result, paste0("../data/Pred_result/", symbol, "_", obj_name, "_XGB.csv"), row.names = F)
+  write.csv(xgb_test_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_XGB.csv"), row.names = F)
   
   #SVM
   set.seed(20207188)
@@ -34,7 +34,7 @@ prediction <- function(train, test, symbol, obj_name){
                            label=round(svm_test_pre,4),
                            train_size=nrow(train))
   
-  write.csv(svm_test_result, paste0("../data/Pred_result/", symbol, "_", obj_name, "_SVM.csv"), row.names = F)
+  write.csv(svm_test_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_SVM.csv"), row.names = F)
   
   #LR
   set.seed(20207188)
@@ -46,7 +46,7 @@ prediction <- function(train, test, symbol, obj_name){
                           label=round(lr_test_pre,4),
                           train_size=nrow(train))
   
-  write.csv(lr_test_result, paste0("../data/Pred_result/", symbol, "_", obj_name, "_LR.csv"), row.names = F)
+  write.csv(lr_test_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_LR.csv"), row.names = F)
   
   #NN
   set.seed(20207188)
@@ -62,7 +62,7 @@ prediction <- function(train, test, symbol, obj_name){
                           label=round(nn_test_pre,4),
                           train_size=nrow(train))
   
-  write.csv(nn_test_result, paste0("../data/Pred_result/", symbol, "_", obj_name, "_NN.csv"), row.names = F)
+  write.csv(nn_test_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_NN.csv"), row.names = F)
   
   result <- list(
     "xgb_test_result" = xgb_test_result,
@@ -115,17 +115,17 @@ pred_result <- function(TI_file, label_file, symbol, obj_name){
   return(pred)
 }
 
-Symbols <- read.csv("../data/NASDAQ_Marketcap60.csv")$Symbol
+Symbols <- read.csv("./data/NASDAQ_Marketcap60.csv")$Symbol
 
 for (symbol in Symbols){
-  stock <- read.csv(paste0("../data/Stock_TI/",symbol ,"_TI.csv"))
+  stock <- read.csv(paste0("./data/Stock_TI/",symbol ,"_TI.csv"))
   stock$Date <- as.Date(stock$Date)
   
-  paper <- readRDS(paste0("../data/GA_RDS/", symbol, "_paper.rds"))
+  paper <- readRDS(paste0("./data/GA_RDS/", symbol, "_paper.rds"))
   
   pred_result(stock, paper, symbol, "PAPER")
   
-  ud_label <- read.csv(paste0("../data/UD_label/", symbol, "_UD.csv"))
+  ud_label <- read.csv(paste0("./data/UD_label/", symbol, "_UD.csv"))
   ud_label$Date <- as.Date(ud_label$Date)
   
   pred_result(stock, ud_label, symbol, "UD")
