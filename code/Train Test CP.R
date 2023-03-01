@@ -37,7 +37,7 @@ ensemble_fun <- function(ensem_v, symbol, type=F){
   return(ensemble)
 }
 
-figure <- function(symbol){
+figure <- function(symbol, p1_margin, p4_margin){
   ud <- read.csv(paste0("./data/UD_label/", symbol, "_UD.csv"))
   ga <- readRDS(paste0("./data/GA_RDS/", symbol, "_paper.rds"))
   ti <- read.csv(paste0("./data/Stock_TI/", symbol, "_TI.csv"))
@@ -83,9 +83,9 @@ figure <- function(symbol){
     scale_fill_manual(values = c("green", "red")) + 
     theme(
       legend.text = element_text(size=10),
-      legend.position = c(0.1,0.7),
+      legend.position = c(0.07, 0.75),
       legend.box.background = element_rect(colour = "black"),
-      axis.title.y = element_text(size=12, margin=margin(r=7))
+      axis.title.y = element_text(size=12, margin=margin(r=p1_margin))
     )
   
   p2 <- ggplot(test, aes(x=as.Date(Date), y=label)) +
@@ -159,9 +159,9 @@ figure <- function(symbol){
     theme_bw() +
     theme(
       legend.text = element_text(size=10),
-      legend.position = c(0.1, 0.7),
+      legend.position = c(0.07, 0.75),
       legend.box.background = element_rect(colour = "black"),
-      axis.title.y = element_text(size=12, margin=margin(r=12.5))
+      axis.title.y = element_text(size=12, margin=margin(r=p4_margin))
     )
   
   result <- arrangeGrob(
@@ -172,23 +172,17 @@ figure <- function(symbol){
   return(result)
 }
 
-AAPL <- figure("AAPL")
-
-AMGN <- figure("AMGN")
-
-ROST <- figure("ROST")
-VRTX <- figure("VRTX")
-
+AAPL <- figure("AAPL", 7, 8)
+png("AAPL Test CP.png", width=3000, height=3000, res=300)
 grid.draw(AAPL)
+dev.off()
 
+AMGN <- figure("AMGN", 7, 12.5)
+png("AMGN Test CP.png", width=3000, height=3000, res=300)
 grid.draw(AMGN)
+dev.off()
 
+VRTX <- figure("VRTX", 7, 5)
+png("VRTX Test CP.png", width=3000, height=3000, res=300)
 grid.draw(VRTX)
-
-
-
-
-
-
-
-
+dev.off()
