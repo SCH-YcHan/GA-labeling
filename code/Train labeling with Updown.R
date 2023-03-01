@@ -1,12 +1,16 @@
 rm(list=ls())
 
-source("Labeling_code.R")
+source("./code/Labeling_code.R")
 
-NASDAQ <- read.csv("../data/Stock_data/pre_NASDAQ.csv")
+NASDAQ <- read.csv("./data/Stock_data/pre_NASDAQ.csv")
 NASDAQ$Date <- as.Date(NASDAQ$Date)
 
-symbols <- read.csv("../data/NASDAQ_Marketcap60.csv")$Symbol
+symbols <- read.csv("./data/NASDAQ_Marketcap60.csv")$Symbol
 #symbols <- symbols[31:60]
+
+if(!file.exists("./data/UD_label")){
+  dir.create("./data/UD_label")
+}
 
 for(symbol in symbols){
   stock <- NASDAQ %>%
@@ -20,5 +24,5 @@ for(symbol in symbols){
     lapply(function(x){data.frame(label = UpDown(x, N=1))}) %>% 
     do.call(cbind, .) %>% 
     cbind(Date=stock$Date, .) %>% 
-    write.csv(paste0("../data/UD_label/", symbol, "_UD.csv"), row.names=F)
+    write.csv(paste0("./data/UD_label/", symbol, "_UD.csv"), row.names=F)
 }

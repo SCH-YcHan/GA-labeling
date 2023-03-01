@@ -1,20 +1,18 @@
 rm(list=ls())
 
-setwd("C:/Users/user/Desktop/GAL/GA-labeling/code")
+source("./code/Objective function.R")
 
-source("Objective function.R")
-
-NASDAQ <- read.csv("../data/Stock_data/pre_NASDAQ.csv")
+NASDAQ <- read.csv("./data/Stock_data/pre_NASDAQ.csv")
 NASDAQ$Date <- as.Date(NASDAQ$Date)
 
-symbols <- read.csv("../data/NASDAQ_Marketcap60.csv")$Symbol
+symbols <- read.csv("./data/NASDAQ_Marketcap60.csv")$Symbol
 
-if(!file.exists("../data/GA_RDS")){
-  dir.create("../data/GA_RDS")
+if(!file.exists("./data/GA_RDS")){
+  dir.create("./data/GA_RDS")
 }
 
 for(symbol in symbols){
-  if(!file.exists(paste0("../data/GA_RDS/", symbol, "_paper.rds"))){
+  if(!file.exists(paste0("./data/GA_RDS/", symbol, "_paper.rds"))){
     print(symbol)
     stock <- NASDAQ %>%
       select(Date, paste(symbol, "Open", sep="_")) %>% 
@@ -31,7 +29,7 @@ for(symbol in symbols){
                    seed = 20207188,
                    parallel = T)
     
-    saveRDS(GA_paper, paste0("../data/GA_RDS/", symbol, "_paper.rds"))
+    saveRDS(GA_paper, paste0("./data/GA_RDS/", symbol, "_paper.rds"))
     
     gc()
   }
