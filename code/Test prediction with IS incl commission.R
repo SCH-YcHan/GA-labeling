@@ -6,7 +6,7 @@ library(e1071)
 library(caret)
 library(nnet)
 library(stringr)
-source("Trading plot.R")
+source("./code/Trading plot.R")
 
 trading <- function(Pred_data){
   Pred_data2 <- Pred_data %>% 
@@ -109,7 +109,7 @@ prediction <- function(train, test){
 }
 
 pre_and_trade <- function(TI_file, GA_file, symbol, plotting=F){
-  ga_name <- str_split(GA_file@call$fitness, "_")[[1]][2]
+  ga_name <- str_split(as.character(GA_file@call$fitness), "_")[[1]][2]
   
   train <- TI_file %>%
     filter(Date < "2019-01-01") %>% 
@@ -145,19 +145,23 @@ pre_and_trade <- function(TI_file, GA_file, symbol, plotting=F){
     lapply(trading) %>% 
     do.call(rbind.data.frame, .)
   
-  write.csv(result, paste0("../data/Trading_result_IS_commission/", symbol, "_", ga_name,".csv"))
+  if(!file.exists("./data/Trading_result_IS_commission")){
+    dir.create("./data/Trading_result_IS_commission")
+  }
+  
+  write.csv(result, paste0("./data/Trading_result_IS_commission/", symbol, "_", ga_name,".csv"))
   
   return(result)
 }
 
-Symbols <- read.csv("../data/NASDAQ_Marketcap60.csv")$Symbol
+Symbols <- read.csv("./data/NASDAQ_Marketcap60.csv")$Symbol
 #Symbols <- Symbols[15:60]
 
 for (symbol in Symbols){
-  stock <- read.csv(paste0("../data/Stock_TI/",symbol ,"_TI.csv"))
+  stock <- read.csv(paste0("./data/Stock_TI/",symbol ,"_TI.csv"))
   stock$Date <- as.Date(stock$Date)
   
-  paper <- readRDS(paste0("../data/GA_RDS/", symbol, "_paper.rds"))
+  paper <- readRDS(paste0("./data/GA_RDS/", symbol, "_paper.rds"))
   
   pre_and_trade(stock, paper, symbol, plotting=F)
 }

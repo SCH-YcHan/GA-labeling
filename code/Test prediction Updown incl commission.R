@@ -6,7 +6,7 @@ library(e1071)
 library(caret)
 library(nnet)
 library(stringr)
-source("Trading plot.R")
+source("./code/Trading plot.R")
 
 trading <- function(Pred_data){
   Pred_data2 <- Pred_data %>% 
@@ -140,19 +140,23 @@ pre_and_trade <- function(TI_file, UD_label, symbol, plotting=F){
     lapply(trading) %>% 
     do.call(rbind.data.frame, .)
   
-  write.csv(result, paste0("../data/UD_result_commission/", symbol, "_UD.csv"))
+  if(!file.exists("./data/UD_result_commission")){
+    dir.create("./data/UD_result_commission")
+  }
+  
+  write.csv(result, paste0("./data/UD_result_commission/", symbol, "_UD.csv"))
   
   return(result)
 }
 
-Symbols <- read.csv("../data/NASDAQ_Marketcap60.csv")$Symbol
+Symbols <- read.csv("./data/NASDAQ_Marketcap60.csv")$Symbol
 #Symbols <- Symbols[31:60]
 
 for (symbol in Symbols){
-  stock <- read.csv(paste0("../data/Stock_TI/",symbol ,"_TI.csv"))
+  stock <- read.csv(paste0("./data/Stock_TI/",symbol ,"_TI.csv"))
   stock$Date <- as.Date(stock$Date)
   
-  ud_label <- read.csv(paste0("../data/UD_label/", symbol, "_UD.csv"))
+  ud_label <- read.csv(paste0("./data/UD_label/", symbol, "_UD.csv"))
   ud_label$Date <- as.Date(ud_label$Date)
   
   pre_and_trade(stock, ud_label, symbol)
