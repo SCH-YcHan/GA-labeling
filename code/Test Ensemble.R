@@ -52,27 +52,6 @@ model_ensemble <- function(ensem_v, symbol){
   }
   
   ensemble <- get(ensem_v[1]) %>% 
-    mutate(label = 0)
-  
-  for (i in 1:v_len){ensemble$label <- ensemble$label + get(ensem_v[i])$label}
-  
-  ensemble$label <- ensemble$label/v_len
-  ensemble$label <- ifelse(ensemble$label<0.5, 1, 2)
-  
-  trade_result <- trading(ensemble)
-  
-  return(cbind(Symbol = symbol, trade_result))
-}
-
-model_ensemble2 <- function(ensem_v, symbol){
-  v_len <- length(ensem_v)
-  
-  for (i in 1:v_len){
-    f <- read.csv(paste0("./data/Pred_result/", symbol, "_PAPER_", ensem_v[i], ".csv"))
-    assign(ensem_v[i], f)
-  }
-  
-  ensemble <- get(ensem_v[1]) %>% 
     mutate(label = ifelse(label<0.5, 1, 2))
   
   for (i in 2:v_len){
@@ -91,7 +70,7 @@ Symbols <- read.csv("./data/NASDAQ_Marketcap60.csv")$Symbol
 
 ensemble_lr_nn <- data.frame()
 for (symbol in Symbols){
-  row <- model_ensemble2(c("LR", "NN"), symbol)
+  row <- model_ensemble(c("LR", "NN"), symbol)
   
   ensemble_lr_nn <- rbind(ensemble_lr_nn, row)
 }
@@ -100,7 +79,7 @@ write.csv(ensemble_lr_nn, "./data/Ensemble_LR_NN.csv", row.names=F)
 
 ensemble_lr_xgb <- data.frame()
 for (symbol in Symbols){
-  row <- model_ensemble2(c("LR", "XGB"), symbol)
+  row <- model_ensemble(c("LR", "XGB"), symbol)
   
   ensemble_lr_xgb <- rbind(ensemble_lr_xgb, row)
 }
@@ -109,7 +88,7 @@ write.csv(ensemble_lr_xgb, "./data/Ensemble_LR_XGB.csv", row.names=F)
 
 ensemble_nn_xgb <- data.frame()
 for (symbol in Symbols){
-  row <- model_ensemble2(c("NN", "XGB"), symbol)
+  row <- model_ensemble(c("NN", "XGB"), symbol)
   
   ensemble_nn_xgb <- rbind(ensemble_nn_xgb, row)
 }
@@ -118,7 +97,7 @@ write.csv(ensemble_nn_xgb, "./data/Ensemble_NN_XGB.csv", row.names=F)
 
 ensemble_lr_nn_xgb <- data.frame()
 for (symbol in Symbols){
-  row <- model_ensemble2(c("LR", "NN", "XGB"), symbol)
+  row <- model_ensemble(c("LR", "NN", "XGB"), symbol)
   
   ensemble_lr_nn_xgb <- rbind(ensemble_lr_nn_xgb, row)
 }
