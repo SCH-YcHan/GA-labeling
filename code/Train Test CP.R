@@ -1,11 +1,12 @@
 rm(list=ls())
 
 library(GA)
+library(zoo)
+library(grid)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(gridExtra)
-library(zoo)
 
 ensemble_fun <- function(ensem_v, symbol, type=F){
   v_len <- length(ensem_v)
@@ -46,6 +47,7 @@ figure <- function(symbol){
   
   ud_ensemble <- ensemble_fun(c("XGB"), symbol, F)
   ga_ensemble <- ensemble_fun(c("LR", "NN", "XGB"), symbol, T)
+  if(ga_ensemble$label[1]==0){ga_ensemble$label[1]=2}
   ud_ensemble$label2 <- ga_ensemble$label
   test <- ud_ensemble %>% select(-train_size)
   test$label[test$label==0] <- NA
@@ -53,13 +55,15 @@ figure <- function(symbol){
   
   test$label2[test$label2==0] <- NA
   test$label2 <- na.locf(test$label2)
-  
+
   p1_test <- test %>%
     select(Date, label2) %>%
     mutate(label2 = ifelse(label2-lag(label2)!=0 | is.na(label2-lag(label2)), label2, 0)) %>%
     filter(label2 != 0) %>% 
     merge(test %>% select(Date, Open), by="Date", all=T)
   
+  if(p1_test$label2[1]==2){p1_test$label2[1]=NA}
+    
   p1_test$label2 <- ifelse(p1_test$label2==1, "Buy", ifelse(p1_test$label2==2, "Sell", NA))
   
   a <- p1_test %>% 
@@ -160,19 +164,26 @@ figure <- function(symbol){
       axis.title.y = element_text(size=12, margin=margin(r=12.5))
     )
   
-  grid.arrange(
+  result <- arrangeGrob(
     p1, p2, p3, p4,
     nrow=4
   )
+
+  return(result)
 }
 
+AAPL <- figure("AAPL")
 
+AMGN <- figure("AMGN")
 
+ROST <- figure("ROST")
+VRTX <- figure("VRTX")
 
+grid.draw(AAPL)
 
+grid.draw(AMGN)
 
-
-
+grid.draw(VRTX)
 
 
 
