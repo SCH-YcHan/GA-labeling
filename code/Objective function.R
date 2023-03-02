@@ -16,7 +16,7 @@ obj_paper <- function(stock_labels){
     dplyr::filter(!is.na(Open))
   
   if((length(data2$label)==1 & data2$label[1]==2) |
-     (length(data2$label)==2 & data2$label[1]==2)){return(0)}
+     (length(data2$label)==2 & data2$label[1]==2)){return(min(data$Open)-max(data$Open))}
   if(data2$label[1]==2){data2$label[1]=NA}
   
   data3 <- data2 %>%
@@ -35,7 +35,7 @@ obj_paper <- function(stock_labels){
   if(N_trade>30 & Wr>=0.33 & Wr<=0.80 & Pr>=0.25 & Pr<=2 & Pf>=1){
     return((Wr*mean_W-(1-Wr)*mean_L)/mean_L*N_trade)
   }else{
-    return(0)
+    return(min(data$Open)-max(data$Open))
   }
 }
 
