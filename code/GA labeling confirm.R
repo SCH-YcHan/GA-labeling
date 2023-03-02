@@ -51,11 +51,11 @@ for (symbol in symbols){
   row <- data.frame(
     Symbol = symbol,
     N_trade = N_trade,
-    Win_ratio = Wr,
-    Mean_gain = mean_W,
-    Mean_loss = mean_L,
-    Payoff_ratio = Pr,
-    Profit_factor = Pf,
+    Win_ratio = round(Wr,3),
+    Mean_gain = round(mean_W,3),
+    Mean_loss = round(mean_L,3),
+    Payoff_ratio = round(Pr,3),
+    Profit_factor = round(Pf,3),
     Fitness = ga@fitnessValue
   )
   
