@@ -60,35 +60,47 @@ prediction <- function(train, test, symbol, obj_name){
                  verbose = F)
   xgb_test_pre <- predict(xgb, test %>% select(-Date, -Open, -Close) %>% data.matrix)
   
+  xgb_pred_result <- cbind(test %>% select(Date, Open),
+                           label=round(xgb_test_pre,4),
+                           train_size=nrow(train))
+
+  write.csv(xgb_pred_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_XGB.csv"), row.names = F)
+  
   xgb_test_result <- cbind(test %>% select(Date, Open),
                            label=ifelse(xgb_test_pre<0.5, 1, 2),
                            train_size=nrow(train))
-  
-  write.csv(xgb_test_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_XGB.csv"), row.names = F)
   
   #SVM
   set.seed(20207188)
   svm <- svm(label-1~., data=train %>% select(-Date, -Open, -Close))
   
   svm_test_pre <- predict(svm, test %>% select(-Date, -Open, -Close)) %>% as.vector
+
+  svm_pred_result <- cbind(test %>% select(Date, Open),
+                           label=round(svm_test_pre,4),
+                           train_size=nrow(train))
+
+  write.csv(svm_pred_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_SVM.csv"), row.names = F)
   
   svm_test_result <- cbind(test %>% select(Date, Open),
                            label=ifelse(svm_test_pre<0.5, 1, 2),
                            train_size=nrow(train))
-  
-  write.csv(svm_test_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_SVM.csv"), row.names = F)
   
   #LR
   set.seed(20207188)
   lr <- glm(label-1~., family="binomial", data=train %>% select(-Date, -Open, -Close))
   
   lr_test_pre <- predict(lr, test %>% select(-Date, -Open, -Close), type="response") %>% as.vector
+
+  lr_pred_result <- cbind(test %>% select(Date, Open),
+                          label=round(lr_test_pre,4),
+                          train_size=nrow(train))
+  
+  write.csv(lr_pred_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_LR.csv"), row.names = F)
   
   lr_test_result <- cbind(test %>% select(Date, Open),
                           label=ifelse(lr_test_pre<0.5, 1, 2),
                           train_size=nrow(train))
-
-  write.csv(lr_test_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_LR.csv"), row.names = F)
   
   #NN
   set.seed(20207188)
@@ -99,12 +111,16 @@ prediction <- function(train, test, symbol, obj_name){
              trace=F)
   
   nn_test_pre <- predict(nn, test %>% select(-Date, -Open, -Close)) %>% as.vector
+
+  nn_pred_result <- cbind(test %>% select(Date, Open),
+                          label=round(nn_test_pre,4),
+                          train_size=nrow(train))
+  
+  write.csv(nn_pred_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_NN.csv"), row.names = F)
   
   nn_test_result <- cbind(test %>% select(Date, Open),
                           label=ifelse(nn_test_pre<0.5, 1, 2),
                           train_size=nrow(train))
-
-  write.csv(nn_test_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_NN.csv"), row.names = F)
   
   result <- list(
     "xgb_test_result" = xgb_test_result,

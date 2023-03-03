@@ -23,7 +23,7 @@ remove_symbol <- c()
 rds_path <- "./data/GA_RDS/"
 for(s in list.files(rds_path)){
   ga_rds <- readRDS(paste0(rds_path,s))
-  if(ga_rds@fitnessValue==0){
+  if(ga_rds@fitnessValue<0){
     remove_symbol <- c(remove_symbol, str_split(s, "_")[[1]][1])
   }
 }
