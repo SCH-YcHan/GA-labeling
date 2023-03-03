@@ -49,7 +49,7 @@ trading <- function(Pred_data){
   return(Pred_data_result)
 }
 
-prediction <- function(train, test){
+prediction <- function(train, test, symbol, obj_name){
   #XGB
   set.seed(20207188)
   xgb <- xgboost(data = train %>% select(-Date, -label, -Open, -Close) %>% data.matrix,
@@ -64,6 +64,8 @@ prediction <- function(train, test){
                            label=ifelse(xgb_test_pre<0.5, 1, 2),
                            train_size=nrow(train))
   
+  write.csv(xgb_test_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_XGB.csv"), row.names = F)
+  
   #SVM
   set.seed(20207188)
   svm <- svm(label-1~., data=train %>% select(-Date, -Open, -Close))
@@ -74,6 +76,8 @@ prediction <- function(train, test){
                            label=ifelse(svm_test_pre<0.5, 1, 2),
                            train_size=nrow(train))
   
+  write.csv(svm_test_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_SVM.csv"), row.names = F)
+  
   #LR
   set.seed(20207188)
   lr <- glm(label-1~., family="binomial", data=train %>% select(-Date, -Open, -Close))
@@ -83,6 +87,8 @@ prediction <- function(train, test){
   lr_test_result <- cbind(test %>% select(Date, Open),
                           label=ifelse(lr_test_pre<0.5, 1, 2),
                           train_size=nrow(train))
+
+  write.csv(lr_test_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_LR.csv"), row.names = F)
   
   #NN
   set.seed(20207188)
@@ -97,6 +103,8 @@ prediction <- function(train, test){
   nn_test_result <- cbind(test %>% select(Date, Open),
                           label=ifelse(nn_test_pre<0.5, 1, 2),
                           train_size=nrow(train))
+
+  write.csv(nn_test_result, paste0("./data/Pred_result/", symbol, "_", obj_name, "_NN.csv"), row.names = F)
   
   result <- list(
     "xgb_test_result" = xgb_test_result,
@@ -130,7 +138,7 @@ pre_and_trade <- function(TI_file, GA_file, symbol, plotting=F){
   train[scale_col] <- predict(prepro, train[scale_col])
   test[scale_col] <- predict(prepro, test[scale_col])
   
-  pred <- prediction(train, test)
+  pred <- prediction(train, test, symbol, ga_name)
   
   if(plotting){
     lapply(
@@ -155,7 +163,10 @@ pre_and_trade <- function(TI_file, GA_file, symbol, plotting=F){
 }
 
 Symbols <- read.csv("./data/NASDAQ_Marketcap60.csv")$Symbol
-#Symbols <- Symbols[15:60]
+
+if(!file.exists("./data/Pred_result")){
+  dir.create("./data/Pred_result")
+}
 
 for (symbol in Symbols){
   stock <- read.csv(paste0("./data/Stock_TI/",symbol ,"_TI.csv"))
