@@ -65,6 +65,3 @@ for (symbol in symbols){
 write.csv(confirm_df, "./data/GA_result.csv", row.names = F)
 
 
-
-
-
