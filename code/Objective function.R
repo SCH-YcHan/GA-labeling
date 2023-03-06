@@ -38,7 +38,7 @@ obj_paper <- function(stock_labels){
   #   return(min(data$Open)-max(data$Open))
   # }
   
-  if(N_trade>=30){
+  if(N_trade>30 & Wr<=0.60 & Pr<=2 & Pf<=2){
     return((Wr*mean_W-(1-Wr)*mean_L)/mean_L*N_trade)
   }else{
     return(min(data$Open)-max(data$Open))
