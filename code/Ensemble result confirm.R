@@ -19,6 +19,15 @@ en_result <- rbind(
   lr_nn_xgb %>% mutate(Model = "lr + nn + xgb")
 )
 
+remove_symbol <- c()
+rds_path <- "./data/GA_RDS/"
+for(s in list.files(rds_path)){
+  ga_rds <- readRDS(paste0(rds_path,s))
+  if(ga_rds@fitnessValue<0){
+    remove_symbol <- c(remove_symbol, str_split(s, "_")[[1]][1])
+  }
+}
+
 MEAN_SD <- function(x){
   M <- round(mean(x, na.rm=T), 2)
   S <- round(sd(x, na.rm=T), 2)
@@ -38,6 +47,26 @@ UD_result %>%
   summarise_all(.funs=MEAN_SD)
 
 en_result %>% 
+  select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
+  group_by(Model) %>% 
+  summarise_all(.funs=MEAN_SD)
+
+paper_result %>% 
+  filter(Model != "svm") %>% 
+  filter(!(Symbol %in% remove_symbol)) %>%
+  select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
+  group_by(Model) %>% 
+  summarise_all(.funs=MEAN_SD) 
+
+UD_result %>% 
+  filter(Model != "svm") %>% 
+  filter(!(Symbol %in% remove_symbol)) %>%
+  select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
+  group_by(Model) %>% 
+  summarise_all(.funs=MEAN_SD)
+
+en_result %>% 
+  filter(!(Symbol %in% remove_symbol)) %>%
   select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
   group_by(Model) %>% 
   summarise_all(.funs=MEAN_SD)
