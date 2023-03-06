@@ -1,6 +1,5 @@
 rm(list=ls())
 
-library(GA)
 library(dplyr)
 
 NASDAQ <- read.csv("./data/Stock_data/pre_NASDAQ.csv")
@@ -8,21 +7,21 @@ NASDAQ$Date <- as.Date(NASDAQ$Date)
 
 symbols <- read.csv("./data/NASDAQ_Marketcap60.csv")$Symbol
 
-rds_path <- "./data/GA_RDS/"
+UD_path <- "./data/UD_label/"
 
 confirm_df <- data.frame()
 
 for (symbol in symbols){
-  ga <- readRDS(paste0(rds_path, symbol, "_paper.rds"))
-  stock_labels <- ga@solution[1,] %>% as.vector
+  ud <- read.csv(paste0(UD_path, symbol, "_UD.csv"))
+  stock_labels <- ud$label
   
   stock <- NASDAQ %>%
     select(Date, paste(symbol, "Open", sep="_")) %>% 
     filter(Date < "2019-01-01")
   
   names(stock) <- c("Date", "Open")
-  
-  data <- cbind(stock, label=as.vector(stock_labels)+1) 
+
+  data <- cbind(stock, label=stock_labels) 
   data$label[nrow(data)]=2
   
   data2 <- data %>% 
@@ -37,7 +36,7 @@ for (symbol in symbols){
   
   data3 <- data2 %>%
     dplyr::filter(!is.na(label)) %>%
-    dplyr::mutate(profit = Open*0.9981-dplyr::lag(Open,1)*1.0019) %>% 
+    dplyr::mutate(profit = Open-dplyr::lag(Open,1)) %>% 
     dplyr::filter(label == 2)
   
   N_trade <- nrow(data3)
@@ -53,13 +52,12 @@ for (symbol in symbols){
     N_trade = N_trade,
     Win_ratio = round(Wr,3),
     Payoff_ratio = round(Pr,3),
-    Profit_factor = round(Pf,3),
-    Fitness = ga@fitnessValue
+    Profit_factor = round(Pf,3)
   )
   
   confirm_df <- rbind(confirm_df, row)
 }
 
-write.csv(confirm_df, "./data/GA_result.csv", row.names = F)
+write.csv(confirm_df, "./data/UD_result.csv", row.names = F)
 
 
