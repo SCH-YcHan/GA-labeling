@@ -54,19 +54,19 @@ en_result %>%
 paper_result %>% 
   filter(Model != "svm") %>% 
   filter(!(Symbol %in% remove_symbol)) %>%
-  select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
+  select(-Symbol, -Cum_Profit, -Buy_hold, -Mean_gain, -Mean_loss) %>% 
   group_by(Model) %>% 
   summarise_all(.funs=MEAN_SD) 
 
 UD_result %>% 
   filter(Model != "svm") %>% 
   filter(!(Symbol %in% remove_symbol)) %>%
-  select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
+  select(-Symbol, -Cum_Profit, -Buy_hold, -Mean_gain, -Mean_loss) %>% 
   group_by(Model) %>% 
   summarise_all(.funs=MEAN_SD)
 
 en_result %>% 
   filter(!(Symbol %in% remove_symbol)) %>%
-  select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
+  select(-Symbol, -Cum_Profit, -Buy_hold, -Mean_gain, -Mean_loss) %>% 
   group_by(Model) %>% 
   summarise_all(.funs=MEAN_SD)
