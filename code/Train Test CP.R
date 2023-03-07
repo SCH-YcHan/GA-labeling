@@ -146,6 +146,8 @@ figure <- function(symbol, p1_margin, p4_margin){
   CP_test$cumsum <- cumsum(ifelse(is.na(CP_test$profit), 0, CP_test$profit))
   CP_test$cumsum2 <- cumsum(ifelse(is.na(CP_test$profit2), 0, CP_test$profit2))
   
+  print(CP_test)
+  
   df_long <- CP_test %>% 
     select(Date, cumsum, cumsum2) %>% 
     pivot_longer(cols = c("cumsum", "cumsum2"), names_to = "Labeling", values_to = "cumulative_profit") %>% 
