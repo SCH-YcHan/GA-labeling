@@ -60,7 +60,8 @@ figure <- function(symbol, p1_margin, p4_margin){
     select(Date, label2) %>%
     mutate(label2 = ifelse(label2-lag(label2)!=0 | is.na(label2-lag(label2)), label2, 0)) %>%
     filter(label2 != 0) %>% 
-    merge(test %>% select(Date, Open), by="Date", all=T)
+    merge(test %>% mutate(Open = lead(Open)) %>% select(Date, Open), by="Date", all=T) %>% 
+    filter(!is.na(Open))
   
   if(p1_test$label2[1]==2){p1_test$label2[1]=NA}
     
@@ -145,8 +146,6 @@ figure <- function(symbol, p1_margin, p4_margin){
   
   CP_test$cumsum <- cumsum(ifelse(is.na(CP_test$profit), 0, CP_test$profit))
   CP_test$cumsum2 <- cumsum(ifelse(is.na(CP_test$profit2), 0, CP_test$profit2))
-  
-  print(CP_test)
   
   df_long <- CP_test %>% 
     select(Date, cumsum, cumsum2) %>% 
