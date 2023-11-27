@@ -3,7 +3,7 @@ library(dplyr)
 
 #Kim & Enke (2017)
 obj_paper <- function(stock_labels){
-  data <- cbind(stock, label=as.vector(stock_labels)+1) 
+  data <- cbind(stock, label=as.vector(stock_labels)+1) %>% na.omit
   
   data$label[nrow(data)]=2
   
@@ -35,7 +35,7 @@ obj_paper <- function(stock_labels){
   if(N_trade>30 & Wr>=0.33 & Wr<=0.80 & Pr>=1 & Pf>=1){
     return((Wr*mean_W-(1-Wr)*mean_L)/mean_L*N_trade)
   }else{
-    return(min(data$Open)-max(data$Open))
+    return(min(data$Open, na.rm = T)-max(data$Open, na.rm = T))
   }
 }
 
