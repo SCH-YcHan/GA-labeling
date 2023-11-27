@@ -1,0 +1,4 @@
+"","Train_size","N_trade","Win_ratio","Mean_gain","Mean_loss","Payoff_ratio","Profit_factor","Cum_Profit","Buy_hold"
+"xgb_test_result",957,0,NA,NA,NA,NA,NA,0,0
+"lr_test_result",957,0,NA,NA,NA,NA,NA,0,0
+"nn_test_result",957,0,NA,NA,NA,NA,NA,0,0
