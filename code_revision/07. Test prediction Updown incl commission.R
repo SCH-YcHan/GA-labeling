@@ -106,7 +106,7 @@ pre_and_trade <- function(TI_file, UD_label, symbol, plotting=F){
   row.names(train) <- NULL
   
   test <- TI_file %>%
-    filter(Date > "2019-01-01" & Date < "2022-01-01")
+    filter(Date > "2019-01-01")
   
   scale_col <- setdiff(names(train), c("Date", "Open", "Close", "label"))
   prepro <- preProcess(train[scale_col], method=c("center", "scale"))
@@ -141,7 +141,7 @@ pre_and_trade <- function(TI_file, UD_label, symbol, plotting=F){
 Symbols <- read.csv("../data/NASDAQ_Marketcap60.csv")$Symbol
 
 for (symbol in Symbols){
-  stock <- read.csv(paste0("../data/Stock_TI/",symbol ,"_TI.csv"))
+  stock <- read.csv(paste0("../data/Stock_TI/", symbol ,"_TI.csv"))
   stock$Date <- as.Date(stock$Date)
   
   ud_label <- read.csv(paste0("../data/UD_label/", symbol, "_UD.csv"))
@@ -150,3 +150,15 @@ for (symbol in Symbols){
   pre_and_trade(stock, ud_label, symbol)
 }
 
+Symbols <- read.csv("../data/KOSPI_Marketcap60.csv")$종목코드
+
+for (symbol in Symbols){
+  symbol <- str_remove(symbol, "X")
+  stock <- read.csv(paste0("../data/Stock_TI/", symbol ,"_TI.csv"))
+  stock$Date <- as.Date(stock$Date)
+  
+  ud_label <- read.csv(paste0("../data/UD_label/", symbol, "_UD.csv"))
+  ud_label$Date <- as.Date(ud_label$Date)
+  
+  pre_and_trade(stock, ud_label, symbol)
+}
