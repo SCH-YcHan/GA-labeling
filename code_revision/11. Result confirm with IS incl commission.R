@@ -34,7 +34,7 @@ NASDAQ_UD_result %>%
 
 NASDAQ_paper_result %>% 
   filter(!(Symbol %in% remove_symbol)) %>%
-  select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
+  select(-Symbol, -Cum_Profit, -Buy_hold) %>%
   group_by(Model) %>% 
   summarise_all(.funs=MEAN_SD)
 
@@ -46,7 +46,7 @@ KOSPI_UD_result %>%
 
 KOSPI_paper_result %>% 
   filter(!(Symbol %in% remove_symbol)) %>%
-  select(-Symbol, -Cum_Profit, -Buy_hold) %>% 
+  select(-Symbol, -Cum_Profit, -Buy_hold) %>%
   group_by(Model) %>% 
   summarise_all(.funs=MEAN_SD)
 
