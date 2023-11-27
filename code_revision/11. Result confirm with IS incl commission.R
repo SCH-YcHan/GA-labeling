@@ -19,6 +19,7 @@ for(s in list.files(rds_path)){
     remove_symbol <- c(remove_symbol, str_split(s, "_")[[1]][1])
   }
 }
+remove_symbol <- c(remove_symbol, "004940.KS")
 
 MEAN_SD <- function(x){
   M <- round(mean(x, na.rm=T), 2)
