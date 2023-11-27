@@ -17,7 +17,7 @@ for(symbol in Symbols){
   UD_result <- rbind(UD_result, f2)
 }
 
-write.csv(UD_result, "./data/NASDAQ_UD_commission_result_60.csv", row.names=F)
+write.csv(UD_result, "../data/NASDAQ_UD_commission_result_60.csv", row.names=F)
 
 rm(list=ls())
 
@@ -36,5 +36,5 @@ for(symbol in Symbols){
   UD_result <- rbind(UD_result, f2)
 }
 
-write.csv(UD_result, "./data/KOSPI_UD_commission_result_60.csv", row.names=F)
+write.csv(UD_result, "../data/KOSPI_UD_commission_result_60.csv", row.names=F)
 
