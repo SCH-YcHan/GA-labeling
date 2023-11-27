@@ -1,0 +1,189 @@
+rm(list=ls())
+
+library(dplyr)
+library(xgboost)
+library(e1071)
+library(caret)
+library(nnet)
+library(stringr)
+source("Trading plot.R")
+
+trading <- function(Pred_data){
+  Pred_data2 <- Pred_data %>% 
+    select(Date, label) %>%
+    mutate(label = ifelse(label-lag(label)!=0 | is.na(label-lag(label)), label, 0)) %>%
+    filter(label != 0) %>% 
+    merge(Pred_data %>% mutate(Open = lead(Open)) %>% select(Date, Open), by="Date", all=T) %>% 
+    filter(!is.na(label)) %>% 
+    filter(!is.na(Open))
+  
+  if(Pred_data2$label[1]==2){Pred_data2$label[1]=NA}
+  
+  Pred_data3 <- Pred_data2 %>%
+    filter(!is.na(label)) %>%
+    mutate(profit = Open*0.9981-lag(Open,1)*1.0019) %>% 
+    filter(label == 2)
+  
+  Pred_data_N_trade <- nrow(Pred_data3)
+  Pred_data_Nw <- sum(Pred_data3$profit>0)
+  Pred_data_Wr <- Pred_data_Nw/Pred_data_N_trade
+  Pred_data_mean_W <- mean(Pred_data3$profit[Pred_data3$profit>0])
+  Pred_data_mean_L <- mean(abs(Pred_data3$profit[Pred_data3$profit<0]))
+  Pred_data_Pwl <- Pred_data_mean_W/Pred_data_mean_L
+  Pred_data_Pf <- Pred_data_Pwl*((Pred_data_Nw/(Pred_data_N_trade-Pred_data_Nw)))
+  Pred_data_cum_profit <- sum(Pred_data3$profit)
+  Pred_data_buy_hold <- Pred_data$Open[nrow(Pred_data)]-Pred_data$Open[1]
+  
+  Pred_data_result <- data.frame(
+    Train_size = Pred_data$train_size[1],
+    N_trade = Pred_data_N_trade,
+    Win_ratio = Pred_data_Wr,
+    Mean_gain = Pred_data_mean_W,
+    Mean_loss = Pred_data_mean_L,
+    Payoff_ratio = Pred_data_Pwl,
+    Profit_factor = Pred_data_Pf,
+    Cum_Profit = Pred_data_cum_profit,
+    Buy_hold = Pred_data_buy_hold
+  )
+  
+  return(Pred_data_result)
+}
+
+prediction <- function(train, test, symbol, obj_name){
+  #XGB
+  set.seed(20207188)
+  xgb <- xgboost(data = train %>% select(-Date, -label, -Open, -Close) %>% data.matrix,
+                 label = train$label-1,
+                 objective = "binary:logistic",
+                 eval_metric = "error",
+                 nrounds = 30,
+                 verbose = F)
+  xgb_test_pre <- predict(xgb, test %>% select(-Date, -Open, -Close) %>% data.matrix)
+  
+  xgb_pred_result <- cbind(test %>% select(Date, Open),
+                           label=round(xgb_test_pre,4),
+                           train_size=nrow(train))
+
+  write.csv(xgb_pred_result, paste0("../data/Pred_result/", symbol, "_", obj_name, "_XGB.csv"), row.names = F)
+  
+  xgb_test_result <- cbind(test %>% select(Date, Open),
+                           label=ifelse(xgb_test_pre<0.5, 1, 2),
+                           train_size=nrow(train))
+  
+  #LR
+  set.seed(20207188)
+  lr <- glm(label-1~., family="binomial", data=train %>% select(-Date, -Open, -Close))
+  
+  lr_test_pre <- predict(lr, test %>% select(-Date, -Open, -Close), type="response") %>% as.vector
+
+  lr_pred_result <- cbind(test %>% select(Date, Open),
+                          label=round(lr_test_pre,4),
+                          train_size=nrow(train))
+  
+  write.csv(lr_pred_result, paste0("../data/Pred_result/", symbol, "_", obj_name, "_LR.csv"), row.names = F)
+  
+  lr_test_result <- cbind(test %>% select(Date, Open),
+                          label=ifelse(lr_test_pre<0.5, 1, 2),
+                          train_size=nrow(train))
+  
+  #NN
+  set.seed(20207188)
+  nn <- nnet(x=train %>% select(-Date, -Open, -Close, -label),
+             y=train$label-1,
+             size=100,
+             MaxNWts=5000,
+             trace=F)
+  
+  nn_test_pre <- predict(nn, test %>% select(-Date, -Open, -Close)) %>% as.vector
+
+  nn_pred_result <- cbind(test %>% select(Date, Open),
+                          label=round(nn_test_pre,4),
+                          train_size=nrow(train))
+  
+  write.csv(nn_pred_result, paste0("../data/Pred_result/", symbol, "_", obj_name, "_NN.csv"), row.names = F)
+  
+  nn_test_result <- cbind(test %>% select(Date, Open),
+                          label=ifelse(nn_test_pre<0.5, 1, 2),
+                          train_size=nrow(train))
+  
+  result <- list(
+    "xgb_test_result" = xgb_test_result,
+    "lr_test_result" = lr_test_result,
+    "nn_test_result" = nn_test_result
+  )
+  
+  return(result)
+}
+
+pre_and_trade <- function(TI_file, GA_file, symbol, plotting=F){
+  ga_name <- str_split(as.character(GA_file@call$fitness), "_")[[1]][2]
+  
+  train <- TI_file %>%
+    filter(Date < "2019-01-01") %>% 
+    cbind(., label = as.vector(GA_file@solution[1,])+1) %>% 
+    na.omit
+  row.names(train) <- NULL
+  
+  train <- train %>%
+    dplyr::mutate(label = ifelse(label-dplyr::lag(label)!=0 | is.na(label-dplyr::lag(label)), label, 0)) %>%
+    dplyr::filter(label != 0) 
+  
+  test <- TI_file %>%
+    filter(Date > "2019-01-01")
+  
+  scale_col <- setdiff(names(train), c("Date", "Open", "Close", "label"))
+  prepro <- preProcess(train[scale_col], method=c("center", "scale"))
+  
+  train[scale_col] <- predict(prepro, train[scale_col])
+  test[scale_col] <- predict(prepro, test[scale_col])
+  
+  pred <- prediction(train, test, symbol, ga_name)
+  
+  if(plotting){
+    lapply(
+      seq_along(pred),
+      trading_plot,
+      Pred_data=pred,
+      plot_name=paste0(symbol, "_", ga_name, "_", names(pred))
+    )
+  }
+  
+  result <- pred %>% 
+    lapply(trading) %>% 
+    do.call(rbind.data.frame, .)
+  
+  if(!file.exists("../data/Trading_result_IS_commission")){
+    dir.create("../data/Trading_result_IS_commission")
+  }
+  
+  write.csv(result, paste0("../data/Trading_result_IS_commission/", symbol, "_", ga_name,".csv"))
+  
+  return(result)
+}
+
+Symbols <- read.csv("../data/NASDAQ_Marketcap60.csv")$Symbol
+
+if(!file.exists("../data/Pred_result")){
+  dir.create("../data/Pred_result")
+}
+
+for (symbol in Symbols){
+  stock <- read.csv(paste0("../data/Stock_TI/",symbol ,"_TI.csv"))
+  stock$Date <- as.Date(stock$Date)
+  
+  paper <- readRDS(paste0("../data/GA_RDS/", symbol, "_paper.rds"))
+  
+  pre_and_trade(stock, paper, symbol, plotting=F)
+}
+
+Symbols <- read.csv("../data/KOSPI_Marketcap60.csv")$종목코드
+
+for (symbol in Symbols){
+  symbol <- str_remove(symbol, "X")
+  stock <- read.csv(paste0("../data/Stock_TI/",symbol ,"_TI.csv"))
+  stock$Date <- as.Date(stock$Date)
+  
+  paper <- readRDS(paste0("../data/GA_RDS/", symbol, "_paper.rds"))
+  
+  pre_and_trade(stock, paper, symbol, plotting=F)
+}
