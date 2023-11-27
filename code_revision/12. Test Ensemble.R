@@ -107,6 +107,7 @@ write.csv(ensemble_lr_nn_xgb, "../data/NASDAQ_Ensemble_LR_NN_XGB.csv", row.names
 
 
 Symbols <- read.csv("../data/KOSPI_Marketcap60.csv")$종목코드
+Symbols <- setdiff(Symbols, "X004940.KS")
 
 ensemble_lr_nn <- data.frame()
 for (symbol in Symbols){
