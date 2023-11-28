@@ -11,6 +11,12 @@ library(gridExtra)
 ensemble_fun <- function(ensem_v, symbol, type=F){
   v_len <- length(ensem_v)
   
+  if(type==F){
+    for (i in 1:v_len){
+      f <- read.csv(paste0("./data/Pred_result/", symbol, "_UD_", ensem_v[i], ".csv"))
+      assign(ensem_v[i], f)
+    }
+  }
   if(type==T){
     for (i in 1:v_len){
       f <- read.csv(paste0("./data/Pred_result/", symbol, "_paper_", ensem_v[i], ".csv"))
@@ -32,9 +38,9 @@ ensemble_fun <- function(ensem_v, symbol, type=F){
 }
 
 figure <- function(symbol, p1_margin, p4_margin){
-  ud <- read.csv(paste0("./data/UD_label/", symbol, "_UD.csv"))
-  ga <- readRDS(paste0("./data/GA_RDS/", symbol, "_paper.rds"))
-  ti <- read.csv(paste0("./data/Stock_TI/", symbol, "_TI.csv"))
+  ud <- read.csv(paste0("../data/UD_label/", symbol, "_UD.csv"))
+  ga <- readRDS(paste0("../data/GA_RDS/", symbol, "_paper.rds"))
+  ti <- read.csv(paste0("../data/Stock_TI/", symbol, "_TI.csv"))
   ud$label2 <- ga@solution[1,]+1 %>% as.vector
   train <- left_join(ud, ti %>% select(Date, Open), by="Date")
   train$label <- na.locf(train$label)
