@@ -13,13 +13,13 @@ ensemble_fun <- function(ensem_v, symbol, type=F){
   
   if(type==F){
     for (i in 1:v_len){
-      f <- read.csv(paste0("./data/Pred_result/", symbol, "_UD_", ensem_v[i], ".csv"))
+      f <- read.csv(paste0("../data/Pred_result/", symbol, "_UD_", ensem_v[i], ".csv"))
       assign(ensem_v[i], f)
     }
   }
   if(type==T){
     for (i in 1:v_len){
-      f <- read.csv(paste0("./data/Pred_result/", symbol, "_paper_", ensem_v[i], ".csv"))
+      f <- read.csv(paste0("../data/Pred_result/", symbol, "_paper_", ensem_v[i], ".csv"))
       assign(ensem_v[i], f)
     }    
   }
@@ -37,7 +37,7 @@ ensemble_fun <- function(ensem_v, symbol, type=F){
   return(ensemble)
 }
 
-figure <- function(symbol, p1_margin, p4_margin){
+figure <- function(symbol, p1_margin, p4_margin, p4_legend_y=0.75){
   ud <- read.csv(paste0("../data/UD_label/", symbol, "_UD.csv"))
   ga <- readRDS(paste0("../data/GA_RDS/", symbol, "_paper.rds"))
   ti <- read.csv(paste0("../data/Stock_TI/", symbol, "_TI.csv"))
@@ -160,7 +160,7 @@ figure <- function(symbol, p1_margin, p4_margin){
     theme_bw() +
     theme(
       legend.text = element_text(size=10),
-      legend.position = c(0.07, 0.75),
+      legend.position = c(0.07, p4_legend_y),
       legend.box.background = element_rect(colour = "black"),
       axis.title.y = element_text(size=12, margin=margin(r=p4_margin))
     )
@@ -173,17 +173,17 @@ figure <- function(symbol, p1_margin, p4_margin){
   return(result)
 }
 
-AAPL <- figure("AAPL", 7, 8)
-png("AAPL Test CP.png", width=3000, height=3000, res=300)
-grid.draw(AAPL)
+ALNY <- figure("ALNY", 7, 8)
+png("../Fig4.png", width=3000, height=3000, res=300)
+grid.draw(ALNY)
 dev.off()
 
-AMGN <- figure("AMGN", 7, 12.5)
-png("AMGN Test CP.png", width=3000, height=3000, res=300)
-grid.draw(AMGN)
+AMZN <- figure("AMZN", 7, 10)
+png("../Fig5.png", width=3000, height=3000, res=300)
+grid.draw(AMZN)
 dev.off()
 
-VRTX <- figure("VRTX", 7, 5)
-png("VRTX Test CP.png", width=3000, height=3000, res=300)
-grid.draw(VRTX)
+EXAS <- figure("EXAS", 7, 10, 0.3)
+png("../Fig6.png", width=3000, height=3000, res=300)
+grid.draw(EXAS)
 dev.off()
