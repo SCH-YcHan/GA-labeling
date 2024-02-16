@@ -32,8 +32,11 @@ NASDAQ_SGA_lr_pf <- NASDAQ_SGA_result %>%
   arrange(Symbol) %>% 
   .$Profit_factor
 
-t.test(NASDAQ_SGA_lr_pf, NASDAQ_UD_lr_pf, paired = TRUE)
-t.test(NASDAQ_SGA_lr_pf, NASDAQ_UD_lr_pf, paired = TRUE, alternative = "greater")
+shapiro.test(NASDAQ_SGA_lr_pf)
+shapiro.test(NASDAQ_UD_lr_pf)
+
+wilcox.test(NASDAQ_SGA_lr_pf, NASDAQ_UD_lr_pf, paired=T)
+wilcox.test(NASDAQ_SGA_lr_pf, NASDAQ_UD_lr_pf, paired=T, alternative="greater")
 
 NASDAQ_UD_nn_pf <- NASDAQ_UD_result %>% 
   filter(!(Symbol %in% remove_symbol)) %>% 
@@ -47,9 +50,11 @@ NASDAQ_SGA_nn_pf <- NASDAQ_SGA_result %>%
   arrange(Symbol) %>% 
   .$Profit_factor
 
-t.test(NASDAQ_SGA_nn_pf, NASDAQ_UD_nn_pf, paired = TRUE)
-t.test(NASDAQ_SGA_nn_pf, NASDAQ_UD_nn_pf, paired = TRUE, alternative = "greater")
-t.test(NASDAQ_SGA_nn_pf, NASDAQ_UD_nn_pf, paired = TRUE, alternative = "less")
+shapiro.test(NASDAQ_SGA_nn_pf)
+shapiro.test(NASDAQ_UD_nn_pf)
+
+wilcox.test(NASDAQ_SGA_nn_pf, NASDAQ_UD_nn_pf, paired=T)
+wilcox.test(NASDAQ_SGA_nn_pf, NASDAQ_UD_nn_pf, paired=T, alternative="greater")
 
 NASDAQ_UD_xgb_pf <- NASDAQ_UD_result %>% 
   filter(!(Symbol %in% remove_symbol)) %>% 
@@ -63,8 +68,12 @@ NASDAQ_SGA_xgb_pf <- NASDAQ_SGA_result %>%
   arrange(Symbol) %>% 
   .$Profit_factor
 
-t.test(NASDAQ_SGA_xgb_pf, NASDAQ_UD_xgb_pf, paired = TRUE)
-t.test(NASDAQ_SGA_xgb_pf, NASDAQ_UD_xgb_pf, paired = TRUE, alternative = "greater")
+shapiro.test(NASDAQ_SGA_xgb_pf)
+shapiro.test(NASDAQ_UD_xgb_pf)
+
+wilcox.test(NASDAQ_SGA_xgb_pf, NASDAQ_UD_xgb_pf, paired=T)
+wilcox.test(NASDAQ_SGA_xgb_pf, NASDAQ_UD_xgb_pf, paired=T, alternative="greater")
+
 
 
 
@@ -81,8 +90,11 @@ KOSPI_SGA_lr_pf <- KOSPI_SGA_result %>%
   arrange(Symbol) %>% 
   .$Profit_factor
 
-t.test(KOSPI_SGA_lr_pf, KOSPI_UD_lr_pf, paired = TRUE)
-t.test(KOSPI_SGA_lr_pf, KOSPI_UD_lr_pf, paired = TRUE, alternative = "greater")
+shapiro.test(KOSPI_SGA_lr_pf)
+shapiro.test(KOSPI_UD_lr_pf)
+
+wilcox.test(KOSPI_SGA_lr_pf, KOSPI_UD_lr_pf, paired=T)
+wilcox.test(KOSPI_SGA_lr_pf, KOSPI_UD_lr_pf, paired=T, alternative="greater")
 
 KOSPI_UD_nn_pf <- KOSPI_UD_result %>% 
   filter(!(Symbol %in% remove_symbol)) %>% 
@@ -96,8 +108,11 @@ KOSPI_SGA_nn_pf <- KOSPI_SGA_result %>%
   arrange(Symbol) %>% 
   .$Profit_factor
 
-t.test(KOSPI_SGA_nn_pf, KOSPI_UD_nn_pf, paired = TRUE)
-t.test(KOSPI_SGA_nn_pf, KOSPI_UD_nn_pf, paired = TRUE, alternative = "greater")
+shapiro.test(KOSPI_SGA_nn_pf)
+shapiro.test(KOSPI_UD_nn_pf)
+
+wilcox.test(KOSPI_SGA_nn_pf, KOSPI_UD_nn_pf, paired=T)
+wilcox.test(KOSPI_SGA_nn_pf, KOSPI_UD_nn_pf, paired=T, alternative="greater")
 
 KOSPI_UD_xgb_pf <- KOSPI_UD_result %>% 
   filter(!(Symbol %in% remove_symbol)) %>% 
@@ -111,8 +126,11 @@ KOSPI_SGA_xgb_pf <- KOSPI_SGA_result %>%
   arrange(Symbol) %>% 
   .$Profit_factor
 
-t.test(KOSPI_SGA_xgb_pf, KOSPI_UD_xgb_pf, paired = TRUE)
-t.test(KOSPI_SGA_xgb_pf, KOSPI_UD_xgb_pf, paired = TRUE, alternative = "greater")
+shapiro.test(KOSPI_SGA_xgb_pf)
+shapiro.test(KOSPI_UD_xgb_pf)
+
+wilcox.test(KOSPI_SGA_xgb_pf, KOSPI_UD_xgb_pf, paired=T)
+wilcox.test(KOSPI_SGA_xgb_pf, KOSPI_UD_xgb_pf, paired=T, alternative="greater")
 
 
 
