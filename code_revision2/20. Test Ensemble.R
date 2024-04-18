@@ -111,6 +111,27 @@ Symbols <- c(
 dividend <- read.csv("../data/Stock_dividend/NASDAQ_dividends_date.csv") %>% 
   mutate(Ex.Dividend.Date = Ex.Dividend.Date %>% as.Date)
 
+UD_lr <- data.frame()
+for (symbol in Symbols){
+  row <- Updown("LR", symbol)
+  UD_lr <- rbind(UD_lr, row)
+}
+write.csv(UD_lr, "../data/NASDAQ_UD_LR.csv", row.names=F)
+
+UD_nn <- data.frame()
+for (symbol in Symbols){
+  row <- Updown("NN", symbol)
+  UD_nn <- rbind(UD_nn, row)
+}
+write.csv(UD_nn, "../data/NASDAQ_UD_NN.csv", row.names=F)
+
+UD_xgb <- data.frame()
+for (symbol in Symbols){
+  row <- Updown("XGB", symbol)
+  UD_xgb <- rbind(UD_xgb, row)
+}
+write.csv(UD_xgb, "../data/NASDAQ_UD_XGB.csv", row.names=F)
+
 SGA_lr <- data.frame()
 for (symbol in Symbols){
   row <- SGA("LR", symbol)
@@ -173,6 +194,27 @@ Symbols <- c(
 
 dividend <- read.csv("../data/Stock_dividend/KOSPI_dividends_date.csv") %>% 
   mutate(Ex.Dividend.Date = Ex.Dividend.Date %>% as.Date)
+
+UD_lr <- data.frame()
+for (symbol in Symbols){
+  row <- Updown("LR", symbol)
+  UD_lr <- rbind(UD_lr, row)
+}
+write.csv(UD_lr, "../data/KOSPI_UD_LR.csv", row.names=F)
+
+UD_nn <- data.frame()
+for (symbol in Symbols){
+  row <- Updown("NN", symbol)
+  UD_nn <- rbind(UD_nn, row)
+}
+write.csv(UD_nn, "../data/KOSPI_UD_NN.csv", row.names=F)
+
+UD_xgb <- data.frame()
+for (symbol in Symbols){
+  row <- Updown("XGB", symbol)
+  UD_xgb <- rbind(UD_xgb, row)
+}
+write.csv(UD_xgb, "../data/KOSPI_UD_XGB.csv", row.names=F)
 
 SGA_lr <- data.frame()
 for (symbol in Symbols){
