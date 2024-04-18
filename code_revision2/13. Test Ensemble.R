@@ -1,8 +1,9 @@
 rm(list=ls())
 
 library(dplyr)
+library(stringr)
 
-trading <- function(Pred_data){
+trading <- function(Pred_data, Dividend_dates){
   Pred_data2 <- Pred_data %>% 
     select(Date, label) %>%
     mutate(label = ifelse(label-lag(label)!=0 | is.na(label-lag(label)), label, 0)) %>%
@@ -15,8 +16,15 @@ trading <- function(Pred_data){
   
   Pred_data3 <- Pred_data2 %>%
     filter(!is.na(label)) %>%
-    mutate(profit = Open*0.9981-lag(Open,1)*1.0019) %>% 
-    filter(label == 2)
+    mutate(grp = cumsum(label == 1)) %>%
+    group_by(grp) %>%
+    filter(n() == 2) %>%
+    summarise(Start_Date = first(Date) %>% as.Date,
+              End_Date = last(Date) %>% as.Date,
+              profit = last(Open)*0.9981 - first(Open)*1.0019) %>%
+    select(-grp) %>%
+    anti_join(Dividend_dates, by = c("Start_Date" = "Ex.Dividend.Date")) %>%
+    anti_join(Dividend_dates, by = c("End_Date" = "Ex.Dividend.Date"))
   
   Pred_data_N_trade <- nrow(Pred_data3)
   Pred_data_Nw <- sum(Pred_data3$profit>0)
@@ -43,6 +51,10 @@ trading <- function(Pred_data){
   return(Pred_data_result)
 }
 
+single_model <- function(){
+  
+}
+
 model_ensemble <- function(ensem_v, symbol){
   v_len <- length(ensem_v)
   
@@ -61,12 +73,25 @@ model_ensemble <- function(ensem_v, symbol){
   
   ensemble <- ensemble %>% filter(label!=0)
   
-  trade_result <- trading(ensemble)
+  Dividend_dates <- dividend %>% 
+    filter(Symbol==symbol)
+  
+  trade_result <- trading(ensemble, Dividend_dates)
   
   return(cbind(Symbol = symbol, trade_result))
 }
 
-Symbols <- read.csv("../data/NASDAQ_Marketcap60.csv")$Symbol
+Symbols <- c(
+  "AAPL", "ADBE", "ALGN", "ALNY", "AMAT", "AMZN", "DLTR", "DXCM", "ENTG", "EXAS", "IDXX",
+  "ILMN", "INTU", "ISRG", "KLAC", "LRCX", "LULU", "MASI", "MELI", "MKTX", "MPWR", "MRVL",
+  "MSFT", "NFLX", "NTAP", "NVDA", "ORLY", "PODD", "POOL", "REGN", "ROST", "SBAC", "SGEN",
+  "TTWO", "ULTA", "VRSN", "VRTX", "ZBRA"
+)
+
+dividend <- read.csv("../data/Stock_dividend/NASDAQ_dividends_date.csv") %>% 
+  mutate(Ex.Dividend.Date = Ex.Dividend.Date %>% as.Date)
+
+
 
 ensemble_lr_nn <- data.frame()
 for (symbol in Symbols){
@@ -106,8 +131,17 @@ write.csv(ensemble_lr_nn_xgb, "../data/NASDAQ_Ensemble_LR_NN_XGB.csv", row.names
 
 
 
-Symbols <- read.csv("../data/KOSPI_Marketcap60.csv")$종목코드
-Symbols <- setdiff(Symbols, "X004940.KS")
+Symbols <- c(
+  "000100.KS", "000120.KS", "000240.KS", "000270.KS", "000660.KS", "001740.KS",
+  "003550.KS", "004170.KS", "005930.KS", "006360.KS", "006400.KS", "006800.KS",
+  "009150.KS", "009540.KS", "010060.KS", "010620.KS", "010950.KS", "011200.KS",
+  "012450.KS", "012630.KS", "016360.KS", "032640.KS", "034220.KS", "035250.KS",
+  "035420.KS", "036460.KS", "042660.KS", "042670.KS", "047040.KS", "051900.KS",
+  "051910.KS", "078930.KS", "096770.KS"
+)
+
+dividend <- read.csv("../data/Stock_dividend/KOSPI_dividends_date.csv") %>% 
+  mutate(Ex.Dividend.Date = Ex.Dividend.Date %>% as.Date)
 
 ensemble_lr_nn <- data.frame()
 for (symbol in Symbols){
