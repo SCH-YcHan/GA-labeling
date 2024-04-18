@@ -51,8 +51,28 @@ trading <- function(Pred_data, Dividend_dates){
   return(Pred_data_result)
 }
 
-single_model <- function(){
+Updown <- function(model_name, symbol){
+  f <- read.csv(paste0("../data/Pred_result/", symbol, "_UD_", model_name, ".csv"))
+  pred <- f %>% mutate(label = ifelse(label<0.5, 1, 2))
   
+  Dividend_dates <- dividend %>% 
+    filter(Symbol==symbol)
+  
+  trade_result <- trading(pred, Dividend_dates)
+  
+  return(cbind(Symbol = symbol, trade_result))
+}
+
+SGA <- function(model_name, symbol){
+  f <- read.csv(paste0("../data/Pred_result/", symbol, "_paper_", model_name, ".csv"))
+  pred <- f %>% mutate(label = ifelse(label<0.5, 1, 2))
+  
+  Dividend_dates <- dividend %>% 
+    filter(Symbol==symbol)
+  
+  trade_result <- trading(pred, Dividend_dates)
+  
+  return(cbind(Symbol = symbol, trade_result))
 }
 
 model_ensemble <- function(ensem_v, symbol){
@@ -91,42 +111,53 @@ Symbols <- c(
 dividend <- read.csv("../data/Stock_dividend/NASDAQ_dividends_date.csv") %>% 
   mutate(Ex.Dividend.Date = Ex.Dividend.Date %>% as.Date)
 
+SGA_lr <- data.frame()
+for (symbol in Symbols){
+  row <- SGA("LR", symbol)
+  SGA_lr <- rbind(SGA_lr, row)
+}
+write.csv(SGA_lr, "../data/NASDAQ_SGA_LR.csv", row.names=F)
 
+SGA_nn <- data.frame()
+for (symbol in Symbols){
+  row <- SGA("NN", symbol)
+  SGA_nn <- rbind(SGA_nn, row)
+}
+write.csv(SGA_nn, "../data/NASDAQ_SGA_NN.csv", row.names=F)
+
+SGA_xgb <- data.frame()
+for (symbol in Symbols){
+  row <- SGA("XGB", symbol)
+  SGA_xgb <- rbind(SGA_xgb, row)
+}
+write.csv(SGA_xgb, "../data/NASDAQ_SGA_XGB.csv", row.names=F)
 
 ensemble_lr_nn <- data.frame()
 for (symbol in Symbols){
   row <- model_ensemble(c("LR", "NN"), symbol)
-  
   ensemble_lr_nn <- rbind(ensemble_lr_nn, row)
 }
-
 write.csv(ensemble_lr_nn, "../data/NASDAQ_Ensemble_LR_NN.csv", row.names=F)
 
 ensemble_lr_xgb <- data.frame()
 for (symbol in Symbols){
   row <- model_ensemble(c("LR", "XGB"), symbol)
-  
   ensemble_lr_xgb <- rbind(ensemble_lr_xgb, row)
 }
-
 write.csv(ensemble_lr_xgb, "../data/NASDAQ_Ensemble_LR_XGB.csv", row.names=F)
 
 ensemble_nn_xgb <- data.frame()
 for (symbol in Symbols){
   row <- model_ensemble(c("NN", "XGB"), symbol)
-  
   ensemble_nn_xgb <- rbind(ensemble_nn_xgb, row)
 }
-
 write.csv(ensemble_nn_xgb, "../data/NASDAQ_Ensemble_NN_XGB.csv", row.names=F)
 
 ensemble_lr_nn_xgb <- data.frame()
 for (symbol in Symbols){
   row <- model_ensemble(c("LR", "NN", "XGB"), symbol)
-  
   ensemble_lr_nn_xgb <- rbind(ensemble_lr_nn_xgb, row)
 }
-
 write.csv(ensemble_lr_nn_xgb, "../data/NASDAQ_Ensemble_LR_NN_XGB.csv", row.names=F)
 
 
@@ -143,42 +174,51 @@ Symbols <- c(
 dividend <- read.csv("../data/Stock_dividend/KOSPI_dividends_date.csv") %>% 
   mutate(Ex.Dividend.Date = Ex.Dividend.Date %>% as.Date)
 
+SGA_lr <- data.frame()
+for (symbol in Symbols){
+  row <- SGA("LR", symbol)
+  SGA_lr <- rbind(SGA_lr, row)
+}
+write.csv(SGA_lr, "../data/KOSPI_SGA_LR.csv", row.names=F)
+
+SGA_nn <- data.frame()
+for (symbol in Symbols){
+  row <- SGA("NN", symbol)
+  SGA_nn <- rbind(SGA_nn, row)
+}
+write.csv(SGA_nn, "../data/KOSPI_SGA_NN.csv", row.names=F)
+
+SGA_xgb <- data.frame()
+for (symbol in Symbols){
+  row <- SGA("XGB", symbol)
+  SGA_xgb <- rbind(SGA_xgb, row)
+}
+write.csv(SGA_xgb, "../data/KOSPI_SGA_XGB.csv", row.names=F)
+
 ensemble_lr_nn <- data.frame()
 for (symbol in Symbols){
-  symbol <- str_remove(symbol, "X")
   row <- model_ensemble(c("LR", "NN"), symbol)
-  
   ensemble_lr_nn <- rbind(ensemble_lr_nn, row)
 }
-
 write.csv(ensemble_lr_nn, "../data/KOSPI_Ensemble_LR_NN.csv", row.names=F)
 
 ensemble_lr_xgb <- data.frame()
 for (symbol in Symbols){
-  symbol <- str_remove(symbol, "X")
   row <- model_ensemble(c("LR", "XGB"), symbol)
-  
   ensemble_lr_xgb <- rbind(ensemble_lr_xgb, row)
 }
-
 write.csv(ensemble_lr_xgb, "../data/KOSPI_Ensemble_LR_XGB.csv", row.names=F)
 
 ensemble_nn_xgb <- data.frame()
 for (symbol in Symbols){
-  symbol <- str_remove(symbol, "X")
   row <- model_ensemble(c("NN", "XGB"), symbol)
-  
   ensemble_nn_xgb <- rbind(ensemble_nn_xgb, row)
 }
-
 write.csv(ensemble_nn_xgb, "../data/KOSPI_Ensemble_NN_XGB.csv", row.names=F)
 
 ensemble_lr_nn_xgb <- data.frame()
 for (symbol in Symbols){
-  symbol <- str_remove(symbol, "X")
   row <- model_ensemble(c("LR", "NN", "XGB"), symbol)
-  
   ensemble_lr_nn_xgb <- rbind(ensemble_lr_nn_xgb, row)
 }
-
 write.csv(ensemble_lr_nn_xgb, "../data/KOSPI_Ensemble_LR_NN_XGB.csv", row.names=F)
